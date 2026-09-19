@@ -26,6 +26,7 @@ import * as scheduled_messages from "./scheduled_messages.ts";
 import * as sent_messages from "./sent_messages.ts";
 import * as server_events_state from "./server_events_state.ts";
 import {current_user} from "./state_data.ts";
+import * as topic_title_suggestion from "./topic_title_suggestion.ts";
 import * as transmit from "./transmit.ts";
 import * as typing from "./typing.ts";
 import {user_settings} from "./user_settings.ts";
@@ -161,6 +162,13 @@ export function send_message_success(
                 sent_message.topic,
             );
         }
+
+        // Check for topic drift right after posting, while the user still
+        // has context. Debounced and silent unless drift is detected.
+        topic_title_suggestion.maybe_check_drift_after_send(
+            sent_message.stream_id,
+            sent_message.topic,
+        );
     }
 }
 

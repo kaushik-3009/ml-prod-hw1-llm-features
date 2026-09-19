@@ -1,80 +1,79 @@
-# Zulip overview
+# HW1: LLM-enabled Zulip features (Message Recap + Topic Title Improver)
 
-[Zulip](https://zulip.com) is an open-source organized team chat app with unique
-[topic-based threading][why-zulip] that combines the best of email and chat to
-make remote work productive and delightful. Fortune 500 companies, [leading open
-source projects][rust-case-study], and thousands of other organizations use
-Zulip every day. Zulip is the only [modern team chat app][features] that is
-designed for both live and asynchronous conversations.
+17-445/17-645/17-745 Machine Learning in Production, Individual Assignment 1.
+This repo is Zulip plus two LLM features (Groq backend). Unless told otherwise,
+start the dev server with Vagrant as below.
 
-Zulip is built by a distributed community of developers from all around the
-world, with 99+ people who have each contributed 100+ commits. With
-over 1,500 contributors merging over 500 commits a month, Zulip is the
-largest and fastest growing open source team chat project.
+## 1. Prerequisites
 
-Come find us on the [development community chat](https://zulip.com/development-community/)!
+- Vagrant (latest) + Docker Desktop (latest) on macOS, or Docker on Linux.
+  2 GB RAM, broadband (first provision downloads several hundred MB).
+- A Groq API key: https://console.groq.com → API Keys → copy your key.
+  (free tier is enough; <$2 of usage for this assignment).
+- No other credentials needed. **Never commit keys** — see §4.
 
-[![GitHub Actions build status](https://github.com/zulip/zulip/actions/workflows/zulip-ci.yml/badge.svg)](https://github.com/zulip/zulip/actions/workflows/zulip-ci.yml?query=branch%3Amain)
-[![coverage status](https://img.shields.io/codecov/c/github/zulip/zulip/main.svg)](https://codecov.io/gh/zulip/zulip)
-[![Mypy coverage](https://img.shields.io/badge/mypy-100%25-green.svg)][mypy-coverage]
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-[![GitHub release](https://img.shields.io/github/release/zulip/zulip.svg)](https://github.com/zulip/zulip/releases/latest)
-[![docs](https://readthedocs.org/projects/zulip/badge/?version=latest)](https://zulip.readthedocs.io/en/latest/)
-[![Zulip chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://chat.zulip.org)
-[![Bluesky](https://img.shields.io/badge/bluesky-@zulip.bsky.social-blue.svg?style=flat)](https://bsky.app/profile/zulip.bsky.social)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/zulip)](https://github.com/sponsors/zulip)
+## 2. Install and run (Vagrant path)
 
-[mypy-coverage]: https://blog.zulip.org/2016/10/13/static-types-in-python-oh-mypy/
-[why-zulip]: https://zulip.com/why-zulip/
-[rust-case-study]: https://zulip.com/case-studies/rust/
-[features]: https://zulip.com/features/
+```bash
+git clone <this-repo-url> zulip && cd zulip
+vagrant up --provider=docker   # first time: 30-60 min
+vagrant ssh
+./tools/run-dev                # serves http://localhost:9991/
+```
 
-## Getting started
+Open http://localhost:9991/devlogin and log in as e.g. `hamlet@zulip.com`.
+No new system dependencies were added: both features reuse the existing
+`openai` client (OpenAI-compatible Groq endpoint) already in Zulip's
+requirements, so `./tools/provision` installs everything automatically.
 
-- **Contributing code**. Check out our [guide for new
-  contributors](https://zulip.readthedocs.io/en/latest/contributing/contributing.html)
-  to get started. We have invested in making Zulip’s code highly
-  readable, thoughtfully tested, and easy to modify. Beyond that, we
-  have written an extraordinary 185K words of documentation for Zulip
-  contributors.
+macOS note: if provisioning fails with `ERR_PNPM_LINKING_FAILED`, switch
+Docker Desktop file sharing to `osxfs (legacy)` for the provision, then back
+to VirtioFS for development.
 
-- **Contributing non-code**. [Report an
-  issue](https://zulip.readthedocs.io/en/latest/contributing/reporting-bugs.html),
-  [translate](https://zulip.readthedocs.io/en/latest/translating/translating.html)
-  Zulip into your language, or [give us
-  feedback](https://zulip.readthedocs.io/en/latest/contributing/suggesting-features.html).
-  We'd love to hear from you, whether you've been using Zulip for years, or are just
-  trying it out for the first time.
+Alternative (used by the author): Ubuntu 22.04 machine (e.g. OrbStack),
+clone inside the Linux filesystem, then `./tools/provision` +
+`./tools/run-dev` directly, no Vagrant.
 
-- **Checking Zulip out**. The best way to see Zulip in action is to [drop
-  by](https://chat.zulip.org/?show_try_zulip_modal) the Zulip development
-  community (no account required). We also recommend reading about Zulip's
-  [unique approach](https://zulip.com/why-zulip/) to organizing conversations.
+## 3. Provide the LLM key
 
-- **Running a Zulip server**. Self-host Zulip directly on Ubuntu or Debian
-  Linux, in [Docker](https://github.com/zulip/docker-zulip), or with prebuilt
-  images for [Digital Ocean](https://marketplace.digitalocean.com/apps/zulip) and
-  [Render](https://render.com/docs/deploy-zulip).
-  Learn more about [self-hosting Zulip](https://zulip.com/self-hosting/).
+Copy your key into the gitignored dev secrets file (never committed):
 
-- **Using Zulip without setting up a server**. Learn about [Zulip
-  Cloud](https://zulip.com/zulip-cloud/) hosting options. Zulip sponsors free [Zulip
-  Cloud Standard](https://zulip.com/plans/) for hundreds of worthy
-  organizations, including [fellow open-source
-  projects](https://zulip.com/for/open-source/).
+```ini
+# zproject/dev-secrets.conf
+[secrets]
+topic_summarization_api_key = PASTE_YOUR_KEY_HERE
+```
 
-- **Participating in [outreach
-  programs](https://zulip.readthedocs.io/en/latest/contributing/contributing.html#outreach-programs)**
-  like [Google Summer of Code](https://developers.google.com/open-source/gsoc/).
+The backend reads it via `TOPIC_SUMMARIZATION_API_KEY` (`zproject/computed_settings.py`);
+the dev default model is `openai/gpt-oss-20b` at
+`https://api.groq.com/openai/v1` (`zproject/dev_settings.py`).
+Restart `./tools/run-dev` after editing secrets. Staff grading should
+substitute their own key in the same file.
 
-- **Supporting Zulip**. Learn about all the ways you can [support
-  Zulip](https://zulip.com/help/support-zulip-project), including contributing
-  financially, and helping others discover it.
+## 4. Secrets hygiene
 
-You may also be interested in reading our [blog](https://blog.zulip.org/), and
-following us on [LinkedIn](https://www.linkedin.com/company/zulip-project/),
-[Mastodon](https://fosstodon.org/@zulip), and [X](https://x.com/zulip).
+- `zproject/dev-secrets.conf` is in `.gitignore` (verified with
+  `git check-ignore`). No `api.key` or `*.key` files are committed.
+- Verify before submitting: search `git log --all -p` for any pasted key
+  material. Only the `PASTE_YOUR_KEY_HERE` placeholder above may appear.
 
-Zulip is distributed under the
-[Apache 2.0](https://github.com/zulip/zulip/blob/main/LICENSE) license.
+## 5. Try the features
+
+- **Message Recap:** Inbox view → **Recap unread** button → modal with an LLM
+  recap of your unread messages; `[msg <id>]` citations and the reference list
+  link straight to the originals (`#narrow/.../near/<id>`).
+  API: `GET /api/v1/messages/recap?limit=30`
+  (get a dev API key: `curl -X POST http://localhost:9991/api/v1/dev_fetch_api_key
+  --data-urlencode username=hamlet@zulip.com`).
+- **Topic Title Improver:** topic popover → **Improve title**, or just send a
+  message — a debounced drift check runs automatically and suggests a better
+  title with **Apply** (renames via `change_all`) / **Dismiss**.
+  API: `POST /api/v1/topics/suggest-title` with `channel_id`, `topic_name`.
+
+## 6. Tests
+
+```bash
+./tools/test-backend zerver.tests.test_message_recap zerver.tests.test_topic_title_suggestion
+```
+
+Details and demo video links: see `implementation.md`.

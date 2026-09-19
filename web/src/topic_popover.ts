@@ -14,6 +14,7 @@ import * as message_delete from "./message_delete.ts";
 import * as message_edit from "./message_edit.ts";
 import * as message_store from "./message_store.ts";
 import * as message_summary from "./message_summary.ts";
+import * as topic_title_suggestion from "./topic_title_suggestion.ts";
 import * as popover_menus from "./popover_menus.ts";
 import * as popover_menus_data from "./popover_menus_data.ts";
 import * as recent_view_ui from "./recent_view_ui.ts";
@@ -302,6 +303,12 @@ function register_popover_menu(target: string, placement: tippy.Placement): void
 
                 $popper.one("click", ".sidebar-popover-summarize-topic", () => {
                     message_summary.get_narrow_summary(stream_id, topic_name);
+
+                    popover_menus.hide_current_popover_if_visible(instance);
+                });
+
+                $popper.one("click", ".sidebar-popover-improve-title", () => {
+                    topic_title_suggestion.suggest_title_for_topic(stream_id, topic_name);
 
                     popover_menus.hide_current_popover_if_visible(instance);
                 });

@@ -232,7 +232,9 @@ DEMO_ORG_DEADLINE_DAYS = 30
 if external_host_env is None and not IS_DEV_DROPLET:
     USING_CAPTCHA = True
 
-TOPIC_SUMMARIZATION_MODEL = "llama-3.3-70b-versatile"
+# NOTE (HW1): upstream default llama-3.3-70b-versatile was retired by Groq
+# (model_not_found as of Sep 2026); gpt-oss-20b is a current cheap chat model.
+TOPIC_SUMMARIZATION_MODEL = "openai/gpt-oss-20b"
 TOPIC_SUMMARIZATION_API_BASE = "https://api.groq.com/openai/v1"
 # Defaults based on groq's pricing for Llama 3.3 70B Versatile 128k.
 # https://groq.com/pricing/

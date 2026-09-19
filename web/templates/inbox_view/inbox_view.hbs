@@ -12,6 +12,9 @@
         {{#if show_channel_folder_toggle}}
         <span class="sidebar-menu-icon channel-folders-inbox-menu-icon hidden-for-spectators"><i class="zulip-icon zulip-icon-more-vertical" aria-label="{{t 'Show channel folders'}}"></i></span>
         {{/if}}
+        <button id="inbox-recap-button" class="action-button action-button-subtle-neutral" tabindex="0" title="{{t 'Generate an AI recap of your unread messages' }}">
+            <span class="action-button-label">{{t "Recap unread" }}</span>
+        </button>
     </div>
     <div id="inbox-empty-with-search" class="inbox-empty-text empty-list-message">
         {{t "No conversations match your filters."}}

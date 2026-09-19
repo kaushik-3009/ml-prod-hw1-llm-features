@@ -1,0 +1,14 @@
+{{rendered_markdown recap}}
+{{#if has_references}}
+<hr />
+<div class="recap-references">
+    <strong>{{t "Referenced messages" }}</strong>
+    <ul>
+        {{#each references}}
+        <li>
+            <a href="{{this.near_url}}" data-message-id="{{this.message_id}}" class="recap-reference-link">#{{this.message_id}} {{this.stream_name}} / {{this.topic}} — {{this.sender}}</a>
+        </li>
+        {{/each}}
+    </ul>
+</div>
+{{/if}}

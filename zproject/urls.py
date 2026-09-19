@@ -86,7 +86,9 @@ from zerver.views.message_flags import (
 )
 from zerver.views.message_report import report_message_backend
 from zerver.views.message_send import render_message_backend, send_message_backend, zcommand_backend
+from zerver.views.message_recap import get_messages_recap
 from zerver.views.message_summary import get_messages_summary
+from zerver.views.topic_title_suggestion import suggest_topic_title
 from zerver.views.muted_users import mute_user, unmute_user
 from zerver.views.navigation_views import (
     add_navigation_view,
@@ -434,7 +436,23 @@ v1_api_and_json_patterns = [
             {"intentionally_undocumented"},
         ),
     ),
+    rest_path(
+        "messages/recap",
+        GET=(
+            get_messages_recap,
+            # Not documented since the API details haven't been finalized yet.
+            {"intentionally_undocumented"},
+        ),
+    ),
     rest_path("messages/render", POST=render_message_backend),
+    rest_path(
+        "topics/suggest-title",
+        POST=(
+            suggest_topic_title,
+            # Not documented since the API details haven't been finalized yet.
+            {"intentionally_undocumented"},
+        ),
+    ),
     rest_path("messages/flags", POST=update_message_flags),
     rest_path("messages/flags/narrow", POST=update_message_flags_for_narrow),
     rest_path("messages/<int:message_id>/history", GET=get_message_edit_history),

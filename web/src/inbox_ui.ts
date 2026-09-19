@@ -30,6 +30,7 @@ import * as left_sidebar_navigation_area from "./left_sidebar_navigation_area.ts
 import * as list_widget from "./list_widget.ts";
 import * as loading from "./loading.ts";
 import {localstorage} from "./localstorage.ts";
+import * as message_recap from "./message_recap.ts";
 import * as message_store from "./message_store.ts";
 import type {Message} from "./message_store.ts";
 import * as message_viewport from "./message_viewport.ts";
@@ -2569,6 +2570,12 @@ export function initialize({hide_other_views}: {hide_other_views: () => void}): 
         filters.delete(views_util.FILTERS.FOLLOWED_TOPICS);
         save_data_to_ls();
         complete_rerender();
+    });
+
+    $("body").on("click", "#inbox-recap-button", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        message_recap.show_unread_recap();
     });
 
     compose_actions.register_compose_cancel_hook(() => {
